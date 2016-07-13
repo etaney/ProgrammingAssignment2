@@ -1,25 +1,39 @@
 ## Put comments here that give an overall description of what your
 ## functions do
 
-## Dumps externally supplied matrix 'y' into a variable 'set' or extracts 'y' with 'get'
+## Sets inv to NULL and never changes it unless you're caching and inverse from outside
+## Returns a list with matrix set/get and with the inverse of same
 
 makeCacheMatrix <- function(x = matrix()) {
   
-  y <<- x      #store external variable x in y
-  
-  get <- function() y  #get function returns 'y'
-  list(get=get) #list with item 'get' uses function 'get' to return y
+  inv <- NULL
+  set <- function(y) {
+    x <<- y
+    inv <<- NULL
+  }
+  get <- function() x
+  setinv <- function(inverse) inv <<- inverse
+  getinv <- function() inv
+  list(set = set, get = get,
+       setinv = setinv,
+       getinv = getinv)
 
 }
 
 
-## Write a short comment describing this function
+## Checks for a NULL value and then retrieves a cached inverse or computes it and stores it in cache.
 
 cacheSolve <- function(x, ...) {
         ## Return a matrix that is the inverse of 'x'
   
-  input <- x$get() #get the cached matrix from x
-  inverse <- solve(input) #invert the cached matrix and dump it in 'inverse'
-  inverse # return 'inverse'
+  m <- x$getinv()
+  if(!is.null(inv)) {
+    message("getting cached data")
+    return(inv)
+  }
+  data <- x$get()
+  inv <- solve(data, ...)
+  x$setinv(inv)
+  inv
   
 }
